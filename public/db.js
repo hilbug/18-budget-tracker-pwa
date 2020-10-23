@@ -2,13 +2,13 @@ let db;
 // create a new db request for a "budget" database. ====> update to use whatever is the mongoose ATLAS name
 const request = indexedDB.open("budget-tracker", 1);
 
-request.onupgradeneeded = function(event) {
+request.onupgradeneeded = (event) => {
    // create object store called "pending" and set autoIncrement to true
   const db = event.target.result;
   db.createObjectStore("pending", { autoIncrement: true });
 };
 
-request.onsuccess = function(event) {
+request.onsuccess = (event) => {
   db = event.target.result;
 
   // check if app is online before reading from db
@@ -17,11 +17,11 @@ request.onsuccess = function(event) {
   }
 };
 
-request.onerror = function(event) {
+request.onerror = (event) => {
   console.log("Woops! " + event.target.errorCode);
 };
 
-function saveRecord(record) {
+const saveRecord = (record) => {
   // create a transaction on the pending db with readwrite access
   const transaction = db.transaction(["pending"], "readwrite");
 
@@ -32,7 +32,7 @@ function saveRecord(record) {
   store.add(record);
 }
 
-function checkDatabase() {
+const checkDatabase = () => {
   // open a transaction on your pending db
   const transaction = db.transaction(["pending"], "readwrite");
   // access your pending object store
@@ -40,7 +40,7 @@ function checkDatabase() {
   // get all records from store and set to a variable
   const getAll = store.getAll();
 
-  getAll.onsuccess = function() {
+  getAll.onsuccess = () => {
     if (getAll.result.length > 0) {
       fetch("/api/transaction/bulk", {
         method: "POST",
@@ -69,7 +69,7 @@ function checkDatabase() {
 window.addEventListener("online", checkDatabase);
 
 /*
-in developer tools, network tab, I can turn it to "offline"
-Code needed this homework is same as mini-project #26. 
+In developer tools, network tab, turn it to "offline" for testing
+Code needed for this homework is same as mini-project #26. 
 I have updated to use arrow functions.
 */
